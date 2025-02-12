@@ -11,8 +11,7 @@ apt-get -qq install --no-install-recommends -y \
     lbzip2 \
     procps vainfo \
     unzip locales tzdata libxml2 xz-utils \
-    python3 \
-    python3-pip \
+    python3.11 \
     curl \
     lsof \
     jq \
@@ -20,6 +19,12 @@ apt-get -qq install --no-install-recommends -y \
     libgl1 \
     libglib2.0-0 \
     libusb-1.0.0
+
+# Ensure python3 defaults to python3.11
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+
+wget -q https://bootstrap.pypa.io/get-pip.py -O get-pip.py \
+    && python3 get-pip.py "pip"
 
 mkdir -p -m 600 /root/.gnupg
 
@@ -30,14 +35,15 @@ yes | dpkg -i /tmp/libedgetpu1-max.deb && export DEBIAN_FRONTEND=noninteractive
 rm /tmp/libedgetpu1-max.deb
 
 # install python3 & tflite runtime
+export PIP_BREAK_SYSTEM_PACKAGES=1
 if [[ "${TARGETARCH}" == "amd64" ]]; then
-    pip3 install --break-system-packages https://github.com/feranick/TFlite-builds/releases/download/v2.17.0/tflite_runtime-2.17.0-cp311-cp311-linux_x86_64.whl
-    pip3 install --break-system-packages https://github.com/feranick/pycoral/releases/download/2.0.2TF2.17.0/pycoral-2.0.2-cp311-cp311-linux_x86_64.whl
+    pip3 install https://github.com/feranick/TFlite-builds/releases/download/v2.17.0/tflite_runtime-2.17.0-cp311-cp311-linux_x86_64.whl
+    pip3 install https://github.com/feranick/pycoral/releases/download/2.0.2TF2.17.0/pycoral-2.0.2-cp311-cp311-linux_x86_64.whl
 fi
 
 if [[ "${TARGETARCH}" == "arm64" ]]; then
-    pip3 install --break-system-packages https://github.com/feranick/TFlite-builds/releases/download/v2.17.0/tflite_runtime-2.17.0-cp311-cp311-linux_aarch64.whl
-    pip3 install --break-system-packages https://github.com/feranick/pycoral/releases/download/2.0.2TF2.17.0/pycoral-2.0.2-cp311-cp311-linux_aarch64.whl
+    pip3 install https://github.com/feranick/TFlite-builds/releases/download/v2.17.0/tflite_runtime-2.17.0-cp311-cp311-linux_aarch64.whl
+    pip3 install https://github.com/feranick/pycoral/releases/download/2.0.2TF2.17.0/pycoral-2.0.2-cp311-cp311-linux_aarch64.whl
 fi
 
 # btbn-ffmpeg -> amd64
